@@ -136,7 +136,7 @@ burndown chart is probably too dumb but you get the idea.
 Before the standup, I create a new sheet for the day, copy the column
 headers from the previous day, and import: 
 
- $ /git2csv.py --daily --milestone "Sprint milestone"
+ $ git2csv --daily --milestone "Sprint milestone"
 
 To start, I usually sort by Size, then Working, then Done.  I work from
 this sheet during the standup, filling the cell backgrounds with red,
@@ -151,10 +151,18 @@ Sprint post-mortem
 =======================
 
 The Review sheet in the tracking workbook is the focus of the post-mortem.
-We review the actual days worked against the initial sizing, with
-consideration given for multiple opens and multitasking.  We end up with a
-green, yellow, or red assessment for each ticket.  Just discussion works
-fine with my team, but YMMV -- a Gantt-type timeline tool would be helpful
-in measuring multitasking. 
+At the start of the sprint, I populate it like so: 
+
+ $ git2csv --all --milestone "Sprint milestone" 
+ 
+When the Working, Done, or Open/Closed state of the ticket changes in a
+standup, the change is reflected on the Review sheet.  The updates are all
+strictly by hand.
+
+At the end of the sprint, we review the actual days worked against the
+initial sizing, with consideration given for multiple opens and
+multitasking.  We end up with a green, yellow, or red assessment for each
+ticket.  Just discussion works fine with my team, but YMMV -- a Gantt-type
+timeline tool would be helpful in measuring multitasking. 
 
 
