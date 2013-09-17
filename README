@@ -92,22 +92,32 @@ Sprint planning
 =====================
 
 Once all my backlog issues are sized I paste them all into a planning 
-spreadsheet like docs/planning-template.xls.  Find all the sized issues and 
-import: 
+spreadsheet like docs/planning-template.xls.  this report finds all the 
+sized, open issues: 
 
   $ github2csv --sized --labels -m "Project Backlog" 
+
+Import that into the sheet. 
 
 Our planning process goes like this.  
 
 We decide on an Importance by consensus on each ticket and enter it in the
 sheet.  This is "Importance for this sprint" so it's not a permanent
-feature of the ticket.  This computes a "Priority" which puts larger
-tickets ahead of smaller ones but mostly reflects the Importance.  
+feature of the ticket.  
 
-Sort the sheet by Priority to get a first crack at the order in which
-tickets get to get on board the sprint.  This is definitely just a starting
-point... there is always horse-trading, resource overcommit, and everything
-else to consider. 
+The sheet computes a "Priority" which puts larger tickets ahead of smaller
+ones but mostly reflects the Importance.  The "Bonus" in the template sheet
+also contributes to Priority (by adding points to the Importance).  We give
+1 Bonus point for the "bug" label and one Bonus for the "voc" (voice of the
+customer) label.  So, for example, if there are two features of the same
+Size and Importance, a bug fix will be higher priority than a non-bugfix,
+and a ticket that was created based on a user bug report or user feature
+request will be higher than one that was not reported by a user. 
+
+Sort the sheet by computed Priority to get a first crack at the order in
+which tickets get to get on board the sprint.  This is definitely just a
+starting point... there is always horse-trading, resource utilization
+leveling, and everything else to consider. 
 
 Putting a "1" in the "Include?" column adds the ticket's size to the Sprint
 Points column.  I click on the header of Sprint Points as we are going to

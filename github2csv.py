@@ -4,11 +4,14 @@ import github3
 import argparse
 import ConfigParser 
 import csv
-import sys 
+import os
 
 sizes = {} 
 
-def define_sizes(size_config="XS: 1, S: 3, M: 7, L: 15, XL: 25, XXL: 1000"): 
+def define_sizes(size_config): 
+    if not size_config:
+        size_config = "XS: 1, S: 3, M: 7, L: 15, XL: 25, XXL: 1000"
+
     for s_pair in size_config.split(","):
         if ':' in s_pair:
             s_label, s_val = s_pair.split(':', 1)
@@ -41,25 +44,34 @@ def main():
 
     args = vars(parser.parse_args())
 
-    conffile = args.get("conffile")
+    conffile = os.path.expanduser(args.get("conffile"))
     try: 
-
         config.read(conffile)
     except ConfigParser.Error, e:
         print "Error parsing config file", conffile 
         print e 
 
-    user = args.get("user", config.get("user", None))
-    password = args.get("password", config.get("password", None))
-    repos = args.get("repo", (config.get("repo", None) or '').split(","))
-    sizes = args.get("sizes", config.get("sizes", default_sizes))
+    def cfile_get(option): 
+        try: 
+            return config.get("github2csv", option)
+        except Exception, e:
+            print "Error getting option", option
+            print e 
+            return None 
+
+    user = args.get("user") or cfile_get("user")
+    password = args.get("password") or cfile_get("password")
+    print ":args:", args.get("repo")
+    print ":cfile:", cfile_get("repo")
+    repos = args.get("repo") or (cfile_get("repo") or '').split(",")
+    sizes = args.get("sizes") or cfile_get("sizes")
     do_unsized = args.get("unsized")
     do_sized = args.get("sized")
     do_daily = args.get("daily")
     do_labels = args.get("labels")
     do_all = args.get("all")
-    milestone = args.get("milestone", config.get("milestone", None))
-    outfile = args.get("outfile", config.get("outfile", None)) 
+    milestone = args.get("milestone") or cfile_get("milestone")
+    outfile = args.get("outfile") or cfile_get("outfile")
 
     define_sizes(sizes)
 
