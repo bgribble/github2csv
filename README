@@ -1,0 +1,150 @@
+github2csv -- Report on GitHub issues in CSV format  
+
+I have been using GitHub issues as part of a scrum-like development 
+process.  I developed this tool to help with planning, daily standup, and
+sprint post-mortem review processes.   It queries the GitHub v3 API,
+filters issues on specified criteria, and produces a CSV output file with
+one issue per line and a selection of fields for each.  
+
+Please see the "Scrum workflow" section below for usage examples. 
+
+Usage
+--------------------
+
+  $ github2csv
+
+
+Configuration file
+--------------------
+
+github2csv uses ConfigParser to provide default options that can be
+overridden by the command line.  Template file: 
+
+    [github2csv]
+    user=[github username]
+    password=[github password] 
+    repo=[ghowner_1/repository_1, ghowner_2/repository_2, ...] 
+    outfile=[filename] 
+    milestone=[default milestone] 
+    sizes=[label1: points1, label2: points2, label3: points3 ...]
+
+
+GitHub Workflow
+--------------------
+
+The tool can be configured, but is also somewhat tied in to the way I use
+GitHub, so let me mention a few things about that. 
+
+Milestones
+====================
+
+There are generally 2 milestones that are relevant at any time.  
+Tickets are created as part of the "product backlog milestone". 
+They stay there until a sprint planning meeting moves them into a 
+"sprint milestone".  Reports for size voting or priority
+assignment/sprint inclusion will pull from the backlog milestone.  
+Daily tracking and postmortem reports pull from the sprint milestone. 
+
+Labels
+====================
+
+I use lots of GitHub labels.  The ones that are relevant for this tool: 
+
+   working: This is set before or during a standup to indicate that the 
+            issue is being actively worked.  This starts the clock for 
+            post-mortem sizing checks.  
+
+   done:    This is set when the developer believes the issue is complete
+            and ready for acceptance and rollout.  
+
+   XS, S, M, L, XL, XXL: Our size labels.  These are assigned by the 
+            scrum master after a size voting process.  You can use
+            different size labels, but this tool will be most useful if
+            you use labels to represent the different issue sizes. 
+
+Commits
+=====================
+
+I require that a commit message includes the GitHub issue number in GitHub
+markdown format ("GitHub #123: Updates to Catalan translation").  If you
+don't have this requirement, commit reporting won't work.  
+
+
+Scrum workflow 
+---------------------
+
+I work with a geographically distributed team so we generally collaborate
+using Skype for voice/IM and shared Google Docs spreadsheets for
+"artifacts".  Here are the things I use github2csv for and the command
+lines I use to do it.
+
+Issue sizing
+=====================
+
+See docs/sizing-template.xls for the template.  I typically add a sheet to
+the workbook once a week or so with newly-added issues.  I run this report
+and "Import" the output file into the sheet: 
+
+  $ github2csv --unsized -m "Project Backlog Milestone"
+
+
+Sprint planning 
+=====================
+
+Once all my backlog issues are sized I paste them all into a planning 
+spreadsheet like docs/planning-template.xls.  Find all the sized issues and 
+import: 
+
+  $ github2csv --sized --labels -m "Project Backlog" 
+
+Our planning process goes like this.  
+
+We decide on an Importance by consensus on each ticket and enter it in the
+sheet.  This is "Importance for this sprint" so it's not a permanent
+feature of the ticket.  This computes a "Priority" which puts larger
+tickets ahead of smaller ones but mostly reflects the Importance.  
+
+Sort the sheet by Priority to get a first crack at the order in which
+tickets get to get on board the sprint.  This is definitely just a starting
+point... there is always horse-trading, resource overcommit, and everything
+else to consider. 
+
+Putting a "1" in the "Include?" column adds the ticket's size to the Sprint
+Points column.  I click on the header of Sprint Points as we are going to
+see how much room we have left from our previously-agreed-upon sprint
+velocity. 
+
+Once we have picked the tickets for the sprint, I visit each one and move
+it to the sprint milestone.  
+
+Daily standup 
+=======================
+
+As the sprint starts I create a sheet like docs/tracking-template.xls.  The
+burndown chart is probably too dumb but you get the idea.  
+
+Before the standup, I create a new sheet for the day, copy the column
+headers from the previous day, and import: 
+
+ $ /git2csv.py --daily --milestone "Sprint milestone"
+
+To start, I usually sort by Size, then Working, then Done.  I work from
+this sheet during the standup, filling the cell backgrounds with red,
+green, yellow, or other descriptive color if I have made changes during the
+meeting. 
+
+After the standup I manually enter the "Open points" and "Not-done points"
+for the day into the Burndown tab.  If any tickets are newly closed, marked
+done, or marked working, I update the "Review" sheet as appropriate.  
+
+Sprint post-mortem
+=======================
+
+The Review sheet in the tracking workbook is the focus of the post-mortem.
+We review the actual days worked against the initial sizing, with
+consideration given for multiple opens and multitasking.  We end up with a
+green, yellow, or red assessment for each ticket.  Just discussion works
+fine with my team, but YMMV -- a Gantt-type timeline tool would be helpful
+in measuring multitasking. 
+
+
