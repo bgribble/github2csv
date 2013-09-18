@@ -26,6 +26,32 @@ To install:
 
     python ./setup.py install 
 
+Usage
+--------------------
+
+$ github2csv -h
+usage: github2csv [-h] [-c CONFFILE] [-r REPO] [-u USER] [-p PASSWORD]
+                  [-m MILESTONE] [-n] [-s] [-l] [-o OUTFILE] [-d] [-a] [-g]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -c CONFFILE, --conffile CONFFILE
+                        Config file name
+  -r REPO, --repo REPO  Repository name (as 'owner/repo')
+  -u USER, --user USER  GitHub username
+  -p PASSWORD, --password PASSWORD
+                        GitHub password
+  -m MILESTONE, --milestone MILESTONE
+                        GitHub milestone
+  -n, --unsized         Get unsized open issues
+  -s, --sized           Get sized open issues
+  -l, --labels          Get labels too
+  -o OUTFILE, --outfile OUTFILE
+                        CSV file to write
+  -d, --daily           Daily activity report
+  -a, --all             Get open and closed tickets
+  -g, --git-commits     Get Git commit activity
+
 Configuration file
 --------------------
 
