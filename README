@@ -8,11 +8,23 @@ one issue per line and a selection of fields for each.
 
 Please see the "Scrum workflow" section below for usage examples. 
 
-Usage
+
+Installation
 --------------------
 
-  $ github2csv
+Requires Python 2.7.
 
+Requires 'githubv3.py' at least 0.7.0, which you can get at: 
+
+    https://github.com/sigmavirus24/github3.py
+
+As of right now (18-Sep-2013), there's a purported version 0.7.0 on pypi 
+which doesn't work... the API of iter_commits has changed and will cause
+errors if you have a version that's too old.
+
+To install: 
+
+    python ./setup.py install 
 
 Configuration file
 --------------------
@@ -66,9 +78,11 @@ Commits
 =====================
 
 I require that a commit message includes the GitHub issue number in GitHub
-markdown format ("GitHub #123: Updates to Catalan translation").  If you
-don't have this requirement, commit reporting won't work.  
-
+markdown format ("GitHub #123: Updates to Catalan translation").  As an
+alternative, you can refer to an issue in the same way in a comment on the
+commit (this is usually just to correct mistakes in the commit message
+without rewriting history).  If you don't do either of these, commit
+reporting (-g) won't work. 
 
 Scrum workflow 
 ---------------------
@@ -81,9 +95,9 @@ lines I use to do it.
 Issue sizing
 =====================
 
-See docs/sizing-template.xls for the template.  I typically add a sheet to
-the workbook once a week or so with newly-added issues.  I run this report
-and "Import" the output file into the sheet: 
+See 'doc/Issue Sizing Template.ods' for the template.  I typically add a
+sheet to the workbook once a week or so with newly-added issues.  I run
+this report and "Import" the output file into the sheet: 
 
   $ github2csv --unsized -m "Project Backlog Milestone"
 
@@ -91,9 +105,9 @@ and "Import" the output file into the sheet:
 Sprint planning 
 =====================
 
-Once all my backlog issues are sized I paste them all into a planning 
-spreadsheet like docs/planning-template.xls.  this report finds all the 
-sized, open issues: 
+Once all my backlog issues are sized I paste them all into a planning
+spreadsheet like 'doc/Sprint Planning Template.ods'.  This report finds all
+the sized, open issues: 
 
   $ github2csv --sized --labels -m "Project Backlog" 
 
@@ -130,13 +144,14 @@ it to the sprint milestone.
 Daily standup 
 =======================
 
-As the sprint starts I create a sheet like docs/tracking-template.xls.  The
-burndown chart is probably too dumb but you get the idea.  
+As the sprint starts I create a sheet like the one in 
+'doc/Sprint Tracking Template.ods'  The burndown chart is probably too 
+dumb but you get the idea.  
 
 Before the standup, I create a new sheet for the day, copy the column
 headers from the previous day, and import: 
 
- $ git2csv --daily --milestone "Sprint milestone"
+ $ git2csv --daily --git-commits --milestone "Sprint milestone"
 
 To start, I usually sort by Size, then Working, then Done.  I work from
 this sheet during the standup, filling the cell backgrounds with red,

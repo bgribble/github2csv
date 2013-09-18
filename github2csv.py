@@ -133,7 +133,6 @@ def main():
                         committers = activity.setdefault(i[1:], [])
                         if str(c.committer) not in committers: 
                             committers.append(str(c.committer))
-                            print i, committers 
 
             for issue in allissues:
                 issue_sized = False 
@@ -179,7 +178,5 @@ def main():
                         issue_count += 1
                         writer.writerow(i) 
             print "Found %d issues in repo %s" % (issue_count, repo)
-
-main()
 
 
