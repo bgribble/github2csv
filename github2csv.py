@@ -5,6 +5,7 @@ import argparse
 import ConfigParser 
 import csv
 import os
+import re 
 
 sizes = {} 
 
@@ -15,6 +16,7 @@ def define_sizes(size_config):
     for s_pair in size_config.split(","):
         if ':' in s_pair:
             s_label, s_val = s_pair.split(':', 1)
+            s_label = unicode(s_label) 
             s_val = float(s_val)
         sizes[s_label.strip()] = s_val    
 
@@ -41,6 +43,7 @@ def main():
     parser.add_argument("-o", "--outfile", default="gitoutput.csv", help="CSV file to write")
     parser.add_argument("-d", "--daily", action="store_true", help="Daily activity report")
     parser.add_argument("-a", "--all", action="store_true", help="Get open and closed tickets")
+    parser.add_argument("-g", "--git-commits", action="store_true", help="Get Git commit activity")
 
     args = vars(parser.parse_args())
 
@@ -55,25 +58,24 @@ def main():
         try: 
             return config.get("github2csv", option)
         except Exception, e:
-            print "Error getting option", option
-            print e 
             return None 
 
     user = args.get("user") or cfile_get("user")
     password = args.get("password") or cfile_get("password")
-    print ":args:", args.get("repo")
-    print ":cfile:", cfile_get("repo")
     repos = args.get("repo") or (cfile_get("repo") or '').split(",")
-    sizes = args.get("sizes") or cfile_get("sizes")
+    size_str = args.get("sizes") or cfile_get("sizes")
     do_unsized = args.get("unsized")
     do_sized = args.get("sized")
     do_daily = args.get("daily")
     do_labels = args.get("labels")
     do_all = args.get("all")
+    do_commits = args.get("git_commits") 
+
     milestone = args.get("milestone") or cfile_get("milestone")
     outfile = args.get("outfile") or cfile_get("outfile")
+    milestone_date = None 
 
-    define_sizes(sizes)
+    define_sizes(size_str)
 
     gh = github3.login(user, password)
 
@@ -82,40 +84,71 @@ def main():
             if "/" not in fullrepo: 
                 print "Bad repository spec '%s' -- use 'owner/reponame' format." % fullrepo
                 continue 
-            owner, repo = fullrepo.split("/", 1)
+            owner, repo = fullrepo.strip().split("/", 1)
             writer = csv.writer(csvfile, delimiter=',')
+            ghrepo = gh.repository(owner, repo)
            
             mstones = {}
+            activity = {} 
             issue_count = 0
-
-            for m in gh.repository("mayorclayhenry", repo).iter_milestones():
+            print "Looking at milestones in:", fullrepo, owner, repo
+            for m in gh.repository(owner, repo).iter_milestones():
                 mstones[str(m.title)] = m.number
 
             if mstones.get(milestone) is None:
                 print "WARNING: did not find milestone '%s' in %s, using *" % (milestone, repo)
+            else: 
+                milestone_date = ghrepo.milestone(mstones.get(milestone)).created_at 
 
-            allissues = gh.iter_repo_issues("mayorclayhenry", repo, 
+            allissues = gh.iter_repo_issues(owner, repo, 
                                             milestone=mstones.get(milestone, "*"), 
                                             state="open")
             if do_all:
-                closedissues = gh.iter_repo_issues("mayorclayhenry", repo, 
+                closedissues = gh.iter_repo_issues(owner, repo, 
                                                    milestone=mstones.get(milestone, "*"), 
                                                    state="closed")
                 allissues = [ i for i in allissues ] + [ i for i in closedissues ]
+
+            if do_commits: 
+                print "Processing commit activity in", repo, "since", milestone_date 
+
+                allcommits = [] 
+
+                for branch in ghrepo.iter_branches():
+                    branchcommits = ghrepo.iter_commits(unicode(branch.commit.sha), 
+                                                        None, None, -1, None,
+                                                        milestone_date)
+                    allcommits.extend(branchcommits)
+
+                print "  .. Found %d total commits" % len(allcommits)
+
+                for c in allcommits: 
+                    if c.commit.message: 
+                        issues = re.findall("#[0-9]+", c.commit.message)
+
+                    for comment in ghrepo.iter_comments_on_commit(c.commit.sha):
+                        issues.extend(re.findall("#[0-9]+", comment.body))
+
+                    for i in issues: 
+                        committers = activity.setdefault(i[1:], [])
+                        if str(c.committer) not in committers: 
+                            committers.append(str(c.committer))
+                            print i, committers 
 
             for issue in allissues:
                 issue_sized = False 
 
                 for l in issue.labels:
-                    if l.name in (u"XS", u"S", u"M", u"L", u"XL", u"XXL"):
+                    if l.name in sizes:
                         issue_sized = True 
 
                 i = [ repo, issue.number, 
-                     "https://www.github.com/mayorclayhenry/%s/issues/%d" %
-                     (repo, issue.number),
+                     "https://www.github.com/%s/%s/issues/%d" %
+                     (owner, repo, issue.number),
                      issue.title ]
                 labels = [ l.name for l in issue.labels ] 
                 i.append(label2size(labels))
+
 
                 if do_daily: 
                     i.append(1 if "working" in labels else '')
@@ -125,13 +158,23 @@ def main():
                         labels.remove("working")
                     if "done" in labels:
                         labels.remove("done")
+
+                    if do_commits: 
+                        committers = activity.get(unicode(issue.number), [])
+                        i.append(','.join(committers))
+
                     i.append(','.join(labels))
                     issue_count += 1
                     writer.writerow(i)
 
                 else:
+                    if do_commits: 
+                        committers = activity.get(unicode(issue.number), [])
+                        i.append(','.join(committers))
+
                     if do_labels:
                         i.append(','.join([l.name for l in issue.labels]))
+
                     if (do_sized and issue_sized) or (do_unsized and not issue_sized): 
                         issue_count += 1
                         writer.writerow(i) 
