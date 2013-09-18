@@ -151,7 +151,7 @@ dumb but you get the idea.
 Before the standup, I create a new sheet for the day, copy the column
 headers from the previous day, and import: 
 
- $ git2csv --daily --git-commits --milestone "Sprint milestone"
+ $ github2csv --daily --git-commits --milestone "Sprint milestone"
 
 To start, I usually sort by Size, then Working, then Done.  I work from
 this sheet during the standup, filling the cell backgrounds with red,
@@ -168,7 +168,7 @@ Sprint post-mortem
 The Review sheet in the tracking workbook is the focus of the post-mortem.
 At the start of the sprint, I populate it like so: 
 
- $ git2csv --all --milestone "Sprint milestone" 
+ $ github2csv --all --milestone "Sprint milestone" 
  
 When the Working, Done, or Open/Closed state of the ticket changes in a
 standup, the change is reflected on the Review sheet.  The updates are all
