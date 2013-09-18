@@ -18,9 +18,9 @@ Requires 'githubv3.py' at least 0.7.0, which you can get at:
 
     https://github.com/sigmavirus24/github3.py
 
-As of right now (18-Sep-2013), there's a purported version 0.7.0 on pypi 
-which doesn't work... the API of iter_commits has changed and will cause
-errors if you have a version that's too old.
+As of right now (18-Sep-2013), there's a purported version 0.7.0 on pypi
+which doesn't work with github2csv... the API of iter_commits has changed
+and will cause errors if you have a version that's too old.
 
 To install: 
 
