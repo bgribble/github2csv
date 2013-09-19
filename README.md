@@ -1,4 +1,4 @@
-# github2csv -- Report on GitHub issues in CSV format #
+### github2csv -- Report on GitHub issues in CSV format ###
 
 I have been using GitHub issues as part of a scrum-like development 
 process.  I developed this tool to help with planning, daily standup, and
@@ -9,7 +9,7 @@ one issue per line and a selection of fields for each.
 Please see the "Scrum workflow" section below for usage examples. 
 
 
-# Installation # 
+### Installation # 
 
 Requires Python 2.7.
 
@@ -25,7 +25,7 @@ To install:
 
     python ./setup.py install 
 
-# Usage # 
+### Usage # 
 
 ``` 
 $ github2csv -h
@@ -51,7 +51,7 @@ optional arguments:
   -g, --git-commits     Get Git commit activity
 ```
 
-# Configuration file #
+### Configuration file ###
 
 github2csv uses ConfigParser to provide default options that can be
 overridden by the command line.  Template file: 
@@ -65,12 +65,12 @@ overridden by the command line.  Template file:
     sizes=[label1: points1, label2: points2, label3: points3 ...]
 
 
-# GitHub Workflow # 
+### GitHub Workflow # 
 
 The tool can be configured, but is also somewhat tied in to the way I use
 GitHub, so let me mention a few things about that. 
 
-## Milestones ##
+#### Milestones ####
 
 There are generally 2 milestones that are relevant at any time.  
 Tickets are created as part of the "product backlog milestone". 
@@ -79,7 +79,7 @@ They stay there until a sprint planning meeting moves them into a
 assignment/sprint inclusion will pull from the backlog milestone.  
 Daily tracking and postmortem reports pull from the sprint milestone. 
 
-## Labels ## 
+#### Labels #### 
 
 I use lots of GitHub labels.  The ones that are relevant for this tool: 
 
@@ -95,7 +95,7 @@ I use lots of GitHub labels.  The ones that are relevant for this tool:
             different size labels, but this tool will be most useful if
             you use labels to represent the different issue sizes. 
 
-## Commits ## 
+#### Commits #### 
 
 In my scrums, I require that a commit message includes the GitHub issue
 number in GitHub markdown format ("GitHub #123: Updates to Catalan
@@ -104,14 +104,14 @@ way in a comment on the commit (this is usually just to correct mistakes in
 the commit message without rewriting history).  If you don't do either of
 these, commit reporting (-g) won't work. 
 
-# Scrum workflow #
+### Scrum workflow ###
 
 I work with a geographically distributed team so we generally collaborate
 using Skype for voice/IM and shared Google Docs spreadsheets for
 "artifacts".  Here are the things I use github2csv for and the command
 lines I use to do it.
 
-## Issue sizing ##
+#### Issue sizing ####
 
 See 'doc/Issue Sizing Template.ods' for the template.  I typically add a
 sheet to the workbook once a week or so with newly-added issues.  I run
@@ -120,7 +120,7 @@ this report and "Import" the output file into the sheet:
   $ github2csv --unsized -m "Project Backlog Milestone"
 
 
-## Sprint planning ##
+#### Sprint planning ####
 
 Once all my backlog issues are sized I paste them all into a planning
 spreadsheet like 'doc/Sprint Planning Template.ods'.  This report finds all
@@ -158,7 +158,7 @@ velocity.
 Once we have picked the tickets for the sprint, I visit each one and move
 it to the sprint milestone.  
 
-## Daily standup  ## 
+#### Daily standup  #### 
 
 As the sprint starts I create a sheet like the one in 
 'doc/Sprint Tracking Template.ods'  The burndown chart is probably too 
@@ -178,7 +178,7 @@ After the standup I manually enter the "Open points" and "Not-done points"
 for the day into the Burndown tab.  If any tickets are newly closed, marked
 done, or marked working, I update the "Review" sheet as appropriate.  
 
-## Sprint post-mortem ## 
+#### Sprint post-mortem #### 
 
 The Review sheet in the tracking workbook is the focus of the post-mortem.
 At the start of the sprint, I populate it like so: 
