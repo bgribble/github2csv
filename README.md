@@ -1,4 +1,5 @@
 github2csv -- Report on GitHub issues in CSV format  
+----------------------------------------------------
 
 I have been using GitHub issues as part of a scrum-like development 
 process.  I developed this tool to help with planning, daily standup, and
@@ -32,7 +33,7 @@ Usage
 $ github2csv -h
 usage: github2csv [-h] [-c CONFFILE] [-r REPO] [-u USER] [-p PASSWORD]
                   [-m MILESTONE] [-n] [-s] [-l] [-o OUTFILE] [-d] [-a] [-g]
-
+``` 
 optional arguments:
   -h, --help            show this help message and exit
   -c CONFFILE, --conffile CONFFILE
@@ -51,6 +52,7 @@ optional arguments:
   -d, --daily           Daily activity report
   -a, --all             Get open and closed tickets
   -g, --git-commits     Get Git commit activity
+```
 
 Configuration file
 --------------------
