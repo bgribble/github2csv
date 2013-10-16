@@ -137,9 +137,12 @@ def main():
                 for c in allcommits:
                     if c.commit.message:
                         issues = re.findall("#[0-9]+", c.commit.message)
-
-                    for comment in ghrepo.iter_comments_on_commit(c.commit.sha):
-                        issues.extend(re.findall("#[0-9]+", comment.body))
+                    try: 
+                        for comment in ghrepo.iter_comments_on_commit(c.commit.sha):
+                            issues.extend(re.findall("#[0-9]+", comment.body))
+                    except Exception, e: 
+                        print " ERROR fetching comments on", c.commit.sha
+                        print " ", e
 
                     for i in issues:
                         committers = activity.setdefault(i[1:], [])

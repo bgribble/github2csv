@@ -175,19 +175,15 @@ green, yellow, or other descriptive color if I have made changes during the
 meeting.
 
 After the standup I manually enter the "Open points" and "Not-done points"
-for the day into the Burndown tab.  If any tickets are newly closed, marked
-done, or marked working, I update the "Review" sheet as appropriate.
+for the day into the Burndown tab.  
 
 #### Sprint post-mortem
 
 The Review sheet in the tracking workbook is the focus of the post-mortem.
-At the start of the sprint, I populate it like so:
-
- $ github2csv --all --milestone "Sprint milestone"
-
-When the Working, Done, or Open/Closed state of the ticket changes in a
-standup, the change is reflected on the Review sheet.  The updates are all
-strictly by hand.
+I populate it using the "review2csv" tool.  review2csv needs on its command
+line EVERY SINGLE daily tracking CSV, in order, with the string "none" for
+weekend days or days that you have no tracking CSV.   You give it the start
+date as well.  
 
 At the end of the sprint, we review the actual days worked against the
 initial sizing, with consideration given for multiple opens and
