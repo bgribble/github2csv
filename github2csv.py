@@ -156,9 +156,9 @@ def main():
                     for i in issues:
                         committers = activity.setdefault(i[1:], {})
                         if str(c.committer) not in committers:
-                            committers[c.committer] = 1
+                            committers[c.committer.login] = 1
                         else: 
-                            committers[c.committer] += 1
+                            committers[c.committer.login] += 1
 
             for issue in allissues:
                 issue_sized = False
