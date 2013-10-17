@@ -27,7 +27,7 @@ def label2size(labels):
         if s_label in labels:
             return s_val
 
-    return None
+    return 0
 
 
 def main():
@@ -91,6 +91,12 @@ def main():
 
     gh = github3.login(user, password)
 
+    open_points = 0
+    closed_points = 0
+    notdone_points = 0 
+    total_points = 0 
+    unsized = [] 
+
     with open(outfile, "w+") as csvfile:
         for fullrepo in repos:
             if "/" not in fullrepo:
@@ -103,6 +109,7 @@ def main():
             mstones = {}
             activity = {}
             issue_count = 0
+
             print "Looking at milestones in:", fullrepo, owner, repo
             for m in gh.repository(owner, repo).iter_milestones():
                 mstones[str(m.title)] = m.number
@@ -112,14 +119,16 @@ def main():
             else:
                 milestone_date = ghrepo.milestone(mstones.get(milestone)).created_at
 
-            allissues = gh.iter_repo_issues(owner, repo,
+            openissues = gh.iter_repo_issues(owner, repo,
                                             milestone=mstones.get(milestone, "*"),
                                             state="open")
+            closedissues = gh.iter_repo_issues(owner, repo,
+                                               milestone=mstones.get(milestone, "*"),
+                                               state="closed")
             if do_all:
-                closedissues = gh.iter_repo_issues(owner, repo,
-                                                   milestone=mstones.get(milestone, "*"),
-                                                   state="closed")
-                allissues = [i for i in allissues] + [i for i in closedissues]
+                allissues = [i for i in openissues] + [i for i in closedissues]
+            else:
+                allissues = [i for i in openissues]
 
             if do_commits:
                 print "Processing commit activity in", repo, "since", milestone_date
@@ -145,9 +154,11 @@ def main():
                         print " ", e
 
                     for i in issues:
-                        committers = activity.setdefault(i[1:], [])
+                        committers = activity.setdefault(i[1:], {})
                         if str(c.committer) not in committers:
-                            committers.append(str(c.committer))
+                            committers[c.committer] = 1
+                        else: 
+                            committers[c.committer] += 1
 
             for issue in allissues:
                 issue_sized = False
@@ -161,20 +172,32 @@ def main():
                      (owner, repo, issue.number),
                      issue.title]
                 labels = [l.name for l in issue.labels]
-                i.append(label2size(labels))
+                isize = label2size(labels) 
+                i.append(isize)
+
+                if isize == 0:
+                    unsized.append((repo, issue.number))
+
 
                 if do_daily:
+                    total_points += isize 
+                    open_points += isize 
+
                     i.append(1 if "working" in labels else '')
                     i.append(1 if "done" in labels else '')
 
                     if "working" in labels:
                         labels.remove("working")
+
                     if "done" in labels:
                         labels.remove("done")
+                    else: 
+                        notdone_points += isize 
 
                     if do_commits:
-                        committers = activity.get(unicode(issue.number), [])
-                        i.append(','.join(committers))
+                        committers = activity.get(unicode(issue.number), {})
+                        i.append(','.join(['%s: %s' % (n, count) 
+                                           for n, count in committers.items()]))
 
                     i.append(','.join(labels))
                     issue_count += 1
@@ -191,4 +214,22 @@ def main():
                     if (do_sized and issue_sized) or (do_unsized and not issue_sized):
                         issue_count += 1
                         writer.writerow(i)
+
+            for issue in closedissues: 
+                labels = [l.name for l in issue.labels]
+                isize = label2size(labels) 
+                closed_points += isize 
+                total_points += isize 
+
             print "Found %d issues in repo %s" % (issue_count, repo)
+
+
+    if do_daily:
+        if len(unsized):
+            print "Open issues with no size set: "
+            for i in unsized:
+                print "%s #%s" % i
+
+        print ("Point totals: %s open, %s not-done, %s closed, %s total" 
+               % (open_points, notdone_points, closed_points, total_points))
+
